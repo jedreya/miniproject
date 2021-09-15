@@ -1,31 +1,80 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useState, useEffect, PureComponent } from 'react';
+
 import { StyleSheet, Text, View, Image, Button, SafeAreaView, TouchableOpacity } from 'react-native';
+import { Camera } from 'expo-camera';
 
-export default class App extends React.Component {
-  render() {
-    return (
-      <SafeAreaView style={styles.container}>
-        <SafeAreaView style={styles.titlecenter}>
-          <Text style={styles.title}>EC463 SW MiniProject</Text>
-        </SafeAreaView>
-        <SafeAreaView style={styles.buttoncontainer}>
-          <SafeAreaView>
-            <TouchableOpacity style={styles.buttons} onPress={() => console.log("button1 tapped")}><Text> Log Out </Text></TouchableOpacity>
-          </SafeAreaView>
-          <SafeAreaView>
-            <TouchableOpacity style={styles.buttons} onPress={() => console.log("button2 tapped")}><Text> Scan Item </Text></TouchableOpacity>
-          </SafeAreaView>
-          <SafeAreaView>
-            <TouchableOpacity style={styles.buttons} onPress={() => console.log("button3 tapped")}><Text> View Profile </Text></TouchableOpacity>
-          </SafeAreaView>
-        </SafeAreaView>
-
-
-      </SafeAreaView >
-    );
+export default function App() {
+  const [hasPermission, setHasPermission] = useState(null);
+  const [type, setType] = useState(Camera.Constants.Type.back);
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
+  if (hasPermission === null) {
+    return <View />;
   }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
+
+  const fetch = require("node-fetch");
+  const params = {
+    api_key: 'tyAxpZ5dhOxlNT0WTnQJAm5ifwa5wyKpfKBbblMi',
+    query: 'cheddar cheese',
+    dataTypes: ["Survey (FNDDS)"],
+    pagesize: 5,
+  };
+  const api_url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${encodeURIComponent(params.api_key)}&query=${encodeURIComponent(params.query)}&dataTypes=${encodeURIComponent(params.dataTypes)}&pagesize=${encodeURIComponent(params.pagesize)}}`
+
+  function getData() {
+    console.log(fetch(api_url));
+    return fetch(api_url)
+      .then[response => response.json()]
+  }
+  return (
+    <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.titlecenter}>
+        <Text style={styles.title}>EC463 SW MiniProject</Text>
+      </SafeAreaView>
+      <View style={styles.titlecenter}>
+        <Camera style={styles.camera} type={type}>
+          <View style={styles.buttonContainer1}>
+            <TouchableOpacity
+              style={styles.button1}
+              onPress={() => {
+                setType(
+                  type === Camera.Constants.Type.back
+                    ? Camera.Constants.Type.front
+                    : Camera.Constants.Type.back
+                );
+              }}>
+              <Text style={styles.text}> Flip </Text>
+            </TouchableOpacity>
+          </View>
+        </Camera>
+      </View>
+      <SafeAreaView style={styles.buttoncontainer}>
+        <SafeAreaView>
+          <TouchableOpacity style={styles.buttons} onPress={() => console.log("button1 tapped")}><Text> Log Out </Text></TouchableOpacity>
+        </SafeAreaView>
+        <SafeAreaView>
+          <TouchableOpacity style={styles.buttons} onPress={() => getData()}><Text> Scan Item </Text></TouchableOpacity>
+        </SafeAreaView>
+        <SafeAreaView>
+          <TouchableOpacity style={styles.buttons} onPress={() => console.log("button3 tapped")}><Text> View Profile </Text></TouchableOpacity>
+        </SafeAreaView>
+      </SafeAreaView>
+
+
+    </SafeAreaView >
+  );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -44,11 +93,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-
   },
   buttons: {
     alignItems: 'center',
     backgroundColor: '#DDDDDD',
     padding: 10
-  }
+  },
+  buttonContainer1: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    margin: 20,
+  },
+  button1: {
+    flex: 0.1,
+    alignSelf: 'flex-end',
+    alignItems: 'center',
+  },
+  camera: {
+    flex: 1,
+    width: 200,
+    height: 300
+  },
 });
