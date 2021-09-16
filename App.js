@@ -3,6 +3,8 @@ import React, { useState, useEffect, PureComponent } from 'react';
 
 import { StyleSheet, Text, View, Image, Button, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Camera } from 'expo-camera';
+import { fetch as fetchPolyfill } from 'whatwg-fetch'
+global.fetch = fetchPolyfill
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
@@ -21,20 +23,19 @@ export default function App() {
   }
 
 
-  const fetch = require("node-fetch");
+  //const fetch = require("node-fetch");
   const params = {
     api_key: 'tyAxpZ5dhOxlNT0WTnQJAm5ifwa5wyKpfKBbblMi',
     query: 'cheddar cheese',
     dataTypes: ["Survey (FNDDS)"],
     pagesize: 5,
   };
-  const api_url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${encodeURIComponent(params.api_key)}&query=${encodeURIComponent(params.query)}&dataTypes=${encodeURIComponent(params.dataTypes)}&pagesize=${encodeURIComponent(params.pagesize)}}`
+  const api_url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${encodeURIComponent(params.api_key)}&query=${encodeURIComponent(params.query)}&dataTypes=${encodeURIComponent(params.dataTypes)}&pagesize=${encodeURIComponent(params.pagesize)}`
 
   function getData() {
-    console.log(fetch(api_url));
-    return fetch(api_url)
-      .then[response => response.json()]
+    return fetch(api_url).then(response => response.json())
   }
+
   return (
     <SafeAreaView style={styles.container}>
       <SafeAreaView style={styles.titlecenter}>
@@ -62,7 +63,7 @@ export default function App() {
           <TouchableOpacity style={styles.buttons} onPress={() => console.log("button1 tapped")}><Text> Log Out </Text></TouchableOpacity>
         </SafeAreaView>
         <SafeAreaView>
-          <TouchableOpacity style={styles.buttons} onPress={() => getData()}><Text> Scan Item </Text></TouchableOpacity>
+          <TouchableOpacity style={styles.buttons} onPress={() => getData().then(data => console.log(data.foods[0]))}><Text> Scan Item </Text></TouchableOpacity>
         </SafeAreaView>
         <SafeAreaView>
           <TouchableOpacity style={styles.buttons} onPress={() => console.log("button3 tapped")}><Text> View Profile </Text></TouchableOpacity>
