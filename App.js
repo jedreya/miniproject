@@ -2,7 +2,8 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
-import * as firebase from 'firebase/app';
+//import * as firebase from 'firebase/app';
+import { firebase } from '@firebase/app';
 
 import Home from './components/Home';
 import Profile from './components/Profile';
