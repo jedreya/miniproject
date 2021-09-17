@@ -37,7 +37,7 @@ export default function Login({ navigation }) {
 				navigation.navigate('Home')
 			}
 			else {
-				navigation.navigate('Profile')
+				signInWithGoogleAsync()
 			}
 		});
 	};

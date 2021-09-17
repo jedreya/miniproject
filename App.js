@@ -8,7 +8,7 @@ import Home from './components/Home';
 import Profile from './components/Profile';
 import Scan from './components/Scan';
 import Login from './components/Login';
-import firebaseConfig from './config';
+import { firebaseConfig } from './config';
 firebase.initializeApp(firebaseConfig);
 
 const RootStack = createStackNavigator({
