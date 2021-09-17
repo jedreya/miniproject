@@ -10,45 +10,106 @@ import 'firebase/auth';
 global.fetch = fetchPolyfill
 
 export default function Login({ navigation }) {
-	const auth = firebase.auth();
+    const auth = firebase.auth();
 
-	async function signInWithGoogleAsync() {
-	  try {
-	    const result = await Google.logInAsync({
-	      behavior: 'web',
-	      //androidClientId: YOUR_CLIENT_ID_HERE,
-	      iosClientId: '746902534968-rc3cnh2t9j5jlegbmnfhodn5ledi1cdm.apps.googleusercontent.com',
-	      scopes: ['profile', 'email'],
-	    });
+    function onSignIn(googleUser) {
+      console.log('Google Auth Response', googleUser);
+      // We need to register an Observer on Firebase Auth to make sure auth is initialized.
+      const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+        unsubscribe();
+        // Check if we are already signed-in Firebase with the correct user.
+        if (!this.isUserEqual(googleUser, firebaseUser)) {
+          // Build Firebase credential with the Google ID token.
+          const credential = GoogleAuthProvider.credential(
+              googleUser.idToken,
+              googleUser.accessToken
+          );
+          // Sign in with credential from the Google user.
+          signInWithCredential(auth, credential).then(function(result){
+            if (result.additionalUserInfo.isNewUser) {
+              firebase.database()
+              firebase.ref('/users/' + result.user.uid)
+              firebase.set({
+                  gmail: result.user.email,
+                  profile_picture: result.additionalUserInfo.profile.picture,
+                  first_name: result.additionalUserInfo.profile.given_name,
+                  last_name: result.additionalUserInfo.profile.family_name,
+                  created_at: Date.now()
+                })
+                } else {
+                  firebase.database()
+                  firebase.ref('/users/' + result.user.uid)
+                  firebase.update({
+                      last_logged_in: Date.now()
+                    });
+                }
+            })
+          .catch((error) => {
+            // Handle Errors here.
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // The email of the user's account used.
+            const email = error.email;
+            // The credential that was used.
+            const credential = GoogleAuthProvider.credentialFromError(error);
+            // ...
+          })
+        };
+      };
+    };
 
-	    if (result.type === 'success') {
-	      return result.accessToken;
-	    } else {
-	      return { cancelled: true };
-	    }
-	  } catch (e) {
-	    return { error: true };
-	  }
-	}
+    function isUserEqual(googleUser, firebaseUser) {
+      if (firebaseUser) {
+        const providerData = firebaseUser.providerData;
+        for (let i = 0; i < providerData.length; i++) {
+          if (providerData[i].providerId === GoogleAuthProvider.PROVIDER_ID &&
+              providerData[i].uid === googleUser.getBasicProfile().getId()) {
+            // We don't need to reauth the Firebase connection.
+            return true;
+          }
+        }
+      }
+      return false;
+    }
 
-	function checkLoggedIn() {
-		auth.onAuthStateChanged(user => {
-			if(user) {
-				navigation.navigate('Home')
-			}
-			else {
-				signInWithGoogleAsync()
-			}
-		});
-	};
+    async function signInWithGoogleAsync() {
+      try {
+        const result = await Google.logInAsync({
+          behavior: 'web',
+          //androidClientId: YOUR_CLIENT_ID_HERE,
+          iosClientId: '746902534968-rc3cnh2t9j5jlegbmnfhodn5ledi1cdm.apps.googleusercontent.com',
+          scopes: ['profile', 'email'],
+        });
 
-	return(
-		<SafeAreaView style={styles.container}>
+        if (result.type === 'success') {
+          onSignIn(result);
+          return result.accessToken;
+        } else {
+          return { cancelled: true };
+        }
+      } catch (e) {
+        return { error: true };
+      }
+    }
+
+    function checkLoggedIn() {
+        auth.onAuthStateChanged(user => {
+            if(user) {
+                navigation.navigate('Home')
+            }
+            else {
+                signInWithGoogleAsync()
+            }
+        });
+    };
+
+    return(
+        <SafeAreaView style={styles.container}>
             <SafeAreaView style={styles.titlecenter}>
                 <TouchableOpacity style={styles.buttons} onPress={() => checkLoggedIn()}><Text> Sign In </Text></TouchableOpacity>
             </SafeAreaView>
         </SafeAreaView>
-	);
+    );
 }
 
 const styles = StyleSheet.create({
