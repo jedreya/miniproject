@@ -2,12 +2,19 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
+import * as firebase from 'firebase/app';
 
 import Home from './components/Home';
 import Profile from './components/Profile';
 import Scan from './components/Scan';
+import Login from './components/Login';
+import firebaseConfig from './config';
+firebase.initializeApp(firebaseConfig);
 
 const RootStack = createStackNavigator({
+  Login: {
+    screen: Login,
+  },
   Home: {
     screen: Home,
   },
@@ -16,7 +23,7 @@ const RootStack = createStackNavigator({
   },
   Scan: {
     screen: Scan,
-  }
+  },
 })
 
 const App = createAppContainer(RootStack);
