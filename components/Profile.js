@@ -6,6 +6,8 @@ import { Camera } from 'expo-camera';
 import { fetch as fetchPolyfill } from 'whatwg-fetch'
 global.fetch = fetchPolyfill
 
+import alignSelf from 'expo-location';
+
 export default function Profile() {
 
     return (
