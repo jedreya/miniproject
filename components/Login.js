@@ -7,7 +7,10 @@ import { NavigationContext } from 'react-navigation';
 import * as GoogleSignIn from 'expo-google-sign-in';
 //import * as firebase from 'firebase/app';
 import firebase from 'firebase/app';
-import "firebase/auth";
+
+import * as Google from 'expo-google-app-auth';
+require('firebase/auth')
+//import "firebase/auth";
 
 
 global.fetch = fetchPolyfill
