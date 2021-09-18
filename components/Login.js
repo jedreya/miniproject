@@ -9,8 +9,8 @@ import * as GoogleSignIn from 'expo-google-sign-in';
 import firebase from 'firebase/app';
 
 import * as Google from 'expo-google-app-auth';
-require('firebase/auth')
-//import "firebase/auth";
+//require('firebase/auth')
+import "firebase/auth";
 
 
 global.fetch = fetchPolyfill
