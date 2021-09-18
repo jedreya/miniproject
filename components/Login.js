@@ -7,8 +7,10 @@ import { NavigationContext } from 'react-navigation';
 import * as GoogleSignIn from 'expo-google-sign-in';
 //import * as firebase from 'firebase/app';
 import firebase from 'firebase/app';
+
 import * as Google from 'expo-google-app-auth';
 require('firebase/auth')
+//import "firebase/auth";
 
 
 global.fetch = fetchPolyfill
@@ -111,6 +113,7 @@ export default function Login({ navigation }) {
     <SafeAreaView style={styles.container}>
       <SafeAreaView style={styles.titlecenter}>
         <TouchableOpacity style={styles.buttons} onPress={() => checkLoggedIn()}><Text> Sign In </Text></TouchableOpacity>
+        <TouchableOpacity style={styles.buttons} onPress={() => navigation.navigate('Home')}><Text> Home </Text></TouchableOpacity>
       </SafeAreaView>
     </SafeAreaView>
   );
